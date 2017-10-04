@@ -48,4 +48,5 @@ movies = [toy_story, avatar, deadpool, school_of_rock, ratatouille, midnight_in_
 
 #fresh_tomatoes.open_movies_page(movies)
 #print(media.Movie.VALID_RATINGS)
-print(media.Movie.__doc__)
+#print(media.Movie.__doc__)
+print("This app uses the " + media.Movie.__name__ + " class defined in the " + media.Movie.__module__ + " module")
