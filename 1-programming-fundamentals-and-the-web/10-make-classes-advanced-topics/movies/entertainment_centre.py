@@ -46,4 +46,5 @@ hunger_games = media.Movie("Hunger Games",
 
 movies = [toy_story, avatar, deadpool, school_of_rock, ratatouille, midnight_in_paris, hunger_games]
 
-fresh_tomatoes.open_movies_page(movies)
+#fresh_tomatoes.open_movies_page(movies)
+print(media.Movie.VALID_RATINGS)
