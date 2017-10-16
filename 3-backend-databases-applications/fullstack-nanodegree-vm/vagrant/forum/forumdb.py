@@ -1,6 +1,6 @@
 # "Database code" for the DB Forum.
 
-import psycopg2
+import psycopg2, bleach
 
 def get_posts():
   """Return all posts from the 'database', most recent first."""
@@ -15,6 +15,6 @@ def add_post(content):
   """Add a post to the 'database' with the current timestamp."""
   db = psycopg2.connect("dbname=forum")
   c = db.cursor()
-  c.execute("insert into posts values (%s)", (content,))
+  c.execute("insert into posts values (%s)", (bleach.clean(content),))
   db.commit()
   db.close()
