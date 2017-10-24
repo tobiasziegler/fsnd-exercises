@@ -24,7 +24,7 @@ class WebServerHandler(BaseHTTPRequestHandler):
             for restaurant in restaurants:
                 output += "<h2>%s</h2>" % restaurant.name
                 output += "<p><a href ='/restaurants/%s/edit'>Edit</a></p>" % restaurant.id
-                output += "<p><a href='#'>Delete</a></p>"
+                output += "<p><a href ='/restaurants/%s/delete'>Delete</a></p>" % restaurant.id
             output += "</body></html>"
             self.wfile.write(output)
             return
@@ -56,6 +56,21 @@ class WebServerHandler(BaseHTTPRequestHandler):
                              action = "/restaurants/%s/edit"><input name =
                              "newRestaurantName" type="text" placeholder = "%s"
                              ><input type="submit" value="Rename"></form>''' % (restaurantIDPath, myRestaurantQuery.name)
+                output += "</body></html>"
+
+                self.wfile.write(output)
+        if self.path.endswith("/delete"):
+            restaurantIDPath = self.path.split("/")[2]
+            myRestaurantQuery = session.query(Restaurant).filter_by(
+                id=restaurantIDPath).one()
+            if myRestaurantQuery:
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                output = "<html><body>"
+                output += "<h1>Are you sure you want to delete %s?</h1>" % myRestaurantQuery.name
+                output += '''<form method="POST" enctype="multipart/form-data"
+                             action = "/restaurants/%s/delete"><input type="submit" value="Delete"></form>''' % restaurantIDPath
                 output += "</body></html>"
 
                 self.wfile.write(output)
@@ -98,6 +113,27 @@ class WebServerHandler(BaseHTTPRequestHandler):
                         # Update the restaurant name in the database
                         myRestaurantQuery.name = messagecontent[0]
                         session.add(myRestaurantQuery)
+                        session.commit()
+
+                        # Redirect back to the restaurant list
+                        self.send_response(301)
+                        self.send_header('Content-type', 'text/html')
+                        self.send_header('Location', '/restaurants')
+                        self.end_headers()
+            if self.path.endswith("/delete"):
+                ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+
+                # Get the new name submitted by the form
+                if ctype == 'multipart/form-data':
+                    fields = cgi.parse_multipart(self.rfile, pdict)
+                    restaurantIDPath = self.path.split("/")[2]
+
+                    myRestaurantQuery = session.query(Restaurant).filter_by(
+                        id=restaurantIDPath).one()
+
+                    if myRestaurantQuery:
+                        # Delete the restaurant from the database
+                        session.delete(myRestaurantQuery)
                         session.commit()
 
                         # Redirect back to the restaurant list
