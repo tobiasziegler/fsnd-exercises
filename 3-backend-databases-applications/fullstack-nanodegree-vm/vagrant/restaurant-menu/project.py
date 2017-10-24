@@ -31,9 +31,21 @@ def newMenuItem(restaurant_id):
         return render_template('newmenuitem.html', restaurant_id =
             restaurant_id)
 
-@app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/edit/')
+@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/edit',
+           methods=['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
-    return "page to edit a menu item. Task 2 complete!"
+    editedItem = session.query(MenuItem).filter_by(id=menu_id).one()
+    if request.method == 'POST':
+        if request.form['name']:
+            editedItem.name = request.form['name']
+        session.add(editedItem)
+        session.commit()
+        return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
+    else:
+        # USE THE RENDER_TEMPLATE FUNCTION BELOW TO SEE THE VARIABLES YOU
+        # SHOULD USE IN YOUR EDITMENUITEM TEMPLATE
+        return render_template(
+            'editmenuitem.html', restaurant_id=restaurant_id, MenuID=menu_id, item=editedItem)
 
 @app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/delete/')
 def deleteMenuItem(restaurant_id, menu_id):
