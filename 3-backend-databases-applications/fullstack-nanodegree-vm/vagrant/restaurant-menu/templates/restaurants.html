@@ -1,0 +1,27 @@
+<html>
+<body>
+
+    <h1>Restaurants</h1>
+
+    <p><a href="#">Create a new restaurant</a></p>
+
+    {% if restaurants %}
+
+    {% for restaurant in restaurants %}
+
+    <p>{{ restaurant.name }}</p>
+
+    <p><a href="#">Edit</a></p>
+
+    <p><a href="#">Delete</a></p>
+
+    {% endfor %}
+
+    {% else %}
+
+    <p>No restaurant listings found</p>
+
+    {% endif %}
+
+</body>
+</html>

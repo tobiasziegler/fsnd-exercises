@@ -1,11 +1,8 @@
 <html>
-<head>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
-</head>
 <body>
 
 <div class="pane">
-    <form action="{{url_for('editMenuItem', restaurant_id = restaurant_id, menu_id = item.id)}}" method="POST">
+    <form action="#" method="POST">
 
     <dl>
 
@@ -17,7 +14,7 @@
     		<dd><input type = 'text' size = '8' name='price' placeholder = '{{item.price}}'></dd>
     	<dt>Course:</dt>
 
-    	{% if item.course == 'Appetizier' %}
+    	{% if item.course == 'Appetizer' %}
     		<dd><input type ='radio' name='course' value='Appetizer'checked >Appetizer</dd>
     	{%else%}
     	<dd><input type ='radio' name='course' value='Appetizer' >Appetizer</dd>
@@ -47,11 +44,11 @@
 
     </dl>
 
-    <input type="submit" value="Edit">
+    <input type="submit" value="Update">
 
     </form>
 
-    <a href="{{url_for('restaurantMenu', restaurant_id= item.restaurant_id)}}">Cancel</a>
+    <a href="#">Cancel</a>
 </div>
 
 </body>
