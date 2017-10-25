@@ -1,6 +1,10 @@
 <html>
+<head>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+</head>
 <body>
 
+<div class="pane">
     <h1>Restaurants</h1>
 
     <p><a href="{{ url_for('newRestaurant' )}}">Create a new restaurant</a></p>
@@ -22,6 +26,6 @@
     <p>No restaurant listings found</p>
 
     {% endif %}
-
+</div>
 </body>
 </html>
