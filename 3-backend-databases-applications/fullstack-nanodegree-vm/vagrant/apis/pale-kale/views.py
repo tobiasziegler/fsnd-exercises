@@ -1,10 +1,18 @@
 from models import Base, User
-from flask import Flask, jsonify, request, url_for, abort, g
+from flask import Flask, jsonify, request, url_for, abort, g, render_template
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
 
 from flask.ext.httpauth import HTTPBasicAuth
+import json
+
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
+import httplib2
+from flask import make_response
+import requests
+
 auth = HTTPBasicAuth()
 
 
@@ -14,6 +22,59 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 app = Flask(__name__)
+
+
+@app.route('/clientOAuth')
+def start():
+    return render_template('clientOAuth.html')
+
+
+@app.route('/oauth/<provider>', methods = ['POST'])
+def login(provider):
+    if provider == 'google':
+        # STEP 1 - parse the auth code
+        auth_code = request.json.get('auth_code')
+
+        # STEP 2 - exchange for a token
+        try:
+            # Upgrade the auth code into a credentials
+            oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+            oauth_flow.redirect_uri = 'postmessage'
+            credentials = oauth_flow.step2_exchange(auth_code)
+        except FlowExchangeError:
+            response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+
+        # STEP 3 - find user or make a new one
+
+        # Get user info
+        h = httplib2.Http()
+        userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+        params = {'access_token': credentials.access_token, 'alt': 'json'}
+        answer = requests.get(userinfo_url, params=params)
+
+        data = answer.json()
+
+        name = data['name']
+        picture = data['picture']
+        email = data['email']
+
+        # See if user exists; if not, make a new one
+        user = session.query(User).filter_by(email=email).first()
+        if not user:
+            user = User(username = name, picture = picture, email = email)
+            session.add(user)
+            session.commit()
+
+        # STEP 4 - Make token
+        token = user.generate_auth_token(600)
+
+        # STEP 5 - Send back token to the client
+        return jsonify({'token': token.decode('ascii')})
+
+    else:
+        return "Unrecognised Provider"
 
 
 #ADD @auth.verify_password decorator here
