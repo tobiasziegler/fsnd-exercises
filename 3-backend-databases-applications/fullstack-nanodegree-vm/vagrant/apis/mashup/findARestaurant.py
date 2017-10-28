@@ -51,9 +51,9 @@ def findARestaurant(mealType,location):
         'address': venue_address,
         'image': venue_image
     }
-    print "Name: %s" % venue_info['name']
-    print "Address: %s" % venue_info['address']
-    print "Image: %s\n" % venue_info['image']
+    # print "Name: %s" % venue_info['name']
+    # print "Address: %s" % venue_info['address']
+    # print "Image: %s\n" % venue_info['image']
     return venue_info
 
 if __name__ == '__main__':
